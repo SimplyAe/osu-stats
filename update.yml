@@ -11,25 +11,35 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Fetch PP and update badge
+      - name: Fetch PP and generate badge
         run: |
-          PP=$(curl -s "https://ez-pp.farm/api/v1/users/stats?id=23848&mode=0&relax=1" | python3 -c "import sys,json; d=json.load(sys.stdin); print(round(d['pp']))")
-          echo $PP > pp.txt
-          cat > badge.svg << EOF
-          <svg xmlns="http://www.w3.org/2000/svg" width="160" height="35">
-            <rect width="60" height="35" rx="17" fill="#111111"/>
-            <rect x="60" width="100" height="35" rx="17" fill="#00ECFF"/>
-            <rect x="50" width="20" height="35" fill="#00ECFF"/>
-            <rect x="60" width="10" height="35" fill="#111111"/>
-            <text x="30" y="23" font-family="Arial" font-size="13" font-weight="bold" fill="white" text-anchor="middle">PP</text>
-            <text x="112" y="23" font-family="Arial" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">${PP}pp</text>
-          </svg>
-          EOF
+          python3 << 'PYEOF'
+          import urllib.request, json
+
+          url = "https://ez-pp.farm/api/v1/users/stats?id=23848&mode=0&relax=1"
+          with urllib.request.urlopen(url) as r:
+              data = json.loads(r.read())
+
+          pp = round(data["pp"])
+
+          svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="160" height="35">
+  <rect width="160" height="35" rx="17" fill="#111111"/>
+  <rect x="55" width="105" height="35" rx="17" fill="#00ECFF"/>
+  <rect x="55" width="20" height="35" fill="#111111"/>
+  <text x="27" y="23" font-family="Arial" font-size="13" font-weight="bold" fill="#00ECFF" text-anchor="middle">PP</text>
+  <text x="112" y="23" font-family="Arial" font-size="13" font-weight="bold" fill="#111111" text-anchor="middle">{pp}pp</text>
+</svg>"""
+
+          with open("badge.svg", "w") as f:
+              f.write(svg)
+
+          print(f"PP: {pp}")
+          PYEOF
 
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add badge.svg pp.txt
-          git diff --staged --quiet || git commit -m "Update PP"
+          git add badge.svg
+          git diff --staged --quiet || git commit -m "Update PP: $(cat badge.svg | grep -o '[0-9]*pp')"
           git push
