@@ -1,7 +1,8 @@
 import urllib.request, json
 
 url = "https://ez-pp.farm/api/v1/users/stats?id=23848&mode=0&relax=1"
-with urllib.request.urlopen(url) as r:
+req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+with urllib.request.urlopen(req) as r:
     data = json.loads(r.read())
 
 pp = round(data["pp"])
