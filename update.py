@@ -1,11 +1,10 @@
 import urllib.request, json
 
 urls = [
-    "https://ez-pp.farm/api/get_user?u=23848&type=id",
-    "https://ez-pp.farm/api/get_user?u=Hu+Tae&type=string",
-    "https://ez-pp.farm/api/v1/get_user?id=23848",
-    "https://ez-pp.farm/api/player/info?id=23848",
-    "https://ez-pp.farm/api/player/info?name=Hu+Tae",
+    "https://ez-pp.farm/api/get_player_info?id=23848&scope=stats",
+    "https://ez-pp.farm/api/get_player_info?name=Hu+Tae&scope=stats",
+    "https://ez-pp.farm/api/get_player_stats?id=23848",
+    "https://ez-pp.farm/api/get_player_scores?id=23848&scope=best",
 ]
 
 for url in urls:
