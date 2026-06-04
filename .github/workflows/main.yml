@@ -1,0 +1,25 @@
+name: Update PP
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch PP and generate badge
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json
+
+          url = "https://ez-pp.farm/api/v1/users/stats?id=23848&mode=0&relax=1"
+          with urllib.request.urlopen(url) as r:
+              data = json.loads(r.read())
+
+          pp = round(data["pp"])
+
+          svg = f"""<svg xmlns="http://www.w3.org/2000/svg" wi
